@@ -23,9 +23,31 @@ runs:
     - name: Install STK CLI
       run: |
         if [[ "$(uname)" = "Linux" ]]; then
-          # Install jq, curl, zip, and git
-          sudo apt-get update
-          sudo apt-get install -y jq curl zip git
+          PACKAGES_TO_INSTALL=""
+          if [ "$(which curl)" = "" ]
+          then
+              PACKAGES_TO_INSTALL="curl "
+          fi
+          if [ "$(which git)" = "" ]
+          then
+              PACKAGES_TO_INSTALL="$PACKAGES_TO_INSTALL git "
+          fi
+          if [ "$(which jq)" = "" ]
+          then
+              PACKAGES_TO_INSTALL="$PACKAGES_TO_INSTALL jq "
+          fi
+          if [ "$(which zip)" = "" ]
+          then
+              PACKAGES_TO_INSTALL="$PACKAGES_TO_INSTALL zip "
+          fi
+          if [ "$PACKAGES_TO_INSTALL" != "" ]
+          then
+              sudo apt-get install -y $PACKAGES_TO_INSTALL
+          else
+              echo "All packages already installed !!!"
+          fi
+          unset PACKAGES_TO_INSTALL
+
           cd /tmp
           curl -fsSL https://stk.stackspot.com/install.sh | bash
           echo "~/.stk/bin" >> $GITHUB_PATH
